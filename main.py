@@ -1,12 +1,8 @@
-import torch
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 import copy
-import seaborn
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 from tqdm import tqdm
 from data import gaussian_data_generator, noise_sampler
@@ -106,7 +102,7 @@ def g_loop(G, D, g_optimizer, d_optimizer, criterion):
 
             with higher.innerloop_ctx(D, d_optimizer) as (functional_D, diff_D_optimizer):
                 for i in range(config.unrolled_steps):
-                    d_unrolled_loop_higher(G, functional_D, diff_D_optimizer, criterion, d_gen_input=gen_input)
+                    d_unrolled_loop_higher(G, functional_D, diff_D_optimizer, criterion, d_gen_input=None)
 
                 g_optimizer.zero_grad()
                 g_fake_data = G(gen_input)
@@ -163,7 +159,7 @@ if __name__ == '__main__':
 
     config = load_config(args.config)
 
-    exp_dir = os.path.join('./experiments', "{}_{}".format(args.config, strftime("%Y-%m-%d_%H:%M:%S", gmtime())))
+    exp_dir = os.path.join('./experiments', "{}_{}".format(config.prefix, strftime("%Y-%m-%d_%H:%M:%S", gmtime())))
     os.makedirs(exp_dir, exist_ok=True)
 
     dset = gaussian_data_generator(config.seed)
