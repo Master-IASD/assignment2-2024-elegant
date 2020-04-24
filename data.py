@@ -1,8 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn
-import ipdb
-
 
 """
     generate 2d gaussian around a circle

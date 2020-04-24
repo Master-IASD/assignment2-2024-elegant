@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import os
-import numpy as np
 import seaborn
 
 def plot_lines(points, title, path):
