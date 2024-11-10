@@ -5,19 +5,18 @@ import argparse
 from torchvision import datasets, transforms
 import torch.nn as nn
 import torch.optim as optim
-
+from scipy.stats import wasserstein_distance
+import numpy as np
 
 from model import Generator, Discriminator
-from utils import D_train, G_train, save_models
-
-
+from utils import D_train, G_train, save_models, load_model
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train Normalizing Flow.')
-    parser.add_argument("--epochs", type=int, default=100,
+    parser.add_argument("--epochs", type=int, default=20,
                         help="Number of epochs for training.")
-    parser.add_argument("--lr", type=float, default=0.0001,
+    parser.add_argument("--lr", type=float, default=0.0002,
                       help="The learning rate to use for training.")
     parser.add_argument("--batch_size", type=int, default=64, 
                         help="Size of mini-batches for SGD")
@@ -59,11 +58,22 @@ if __name__ == '__main__':
 
 
     # define loss
+    def Earth_Mover_Loss(output, target):
+        output_sorted, _ = torch.sort(output)
+        target_sorted, _ = torch.sort(target)
+        
+        # Calculate the cumulative sums
+        cdf_output = torch.cumsum(output_sorted, dim=-1)
+        cdf_target = torch.cumsum(target_sorted, dim=-1)
+        
+        # Compute the Earth Mover Loss as the L1 distance between cumulative distributions
+        em_loss = torch.mean(torch.abs(cdf_output - cdf_target))
+        return em_loss
     criterion = nn.BCELoss() 
 
     # define optimizers
-    G_optimizer = optim.Adam(G.parameters(), lr = args.lr)
-    D_optimizer = optim.Adam(D.parameters(), lr = args.lr)
+    G_optimizer = optim.Adam(G.parameters(), lr = args.lr, betas=(0.0, 0.9))
+    D_optimizer = optim.Adam(D.parameters(), lr = args.lr, betas=(0.0, 0.9))
 
     print('Start Training :')
     
@@ -71,10 +81,16 @@ if __name__ == '__main__':
     for epoch in trange(1, n_epoch+1, leave=True):           
         for batch_idx, (x, _) in enumerate(train_loader):
             x = x.view(-1, mnist_dim)
-            D_train(x, G, D, D_optimizer, criterion)
-            G_train(x, G, D, G_optimizer, criterion)
+            x_real = x
+            #D_train(x, G, D, D_optimizer, criterion)
+            #G_train(x, G, D, G_optimizer, criterion)
+            for _ in range(5):
+                z = torch.randn(x_real.shape[0], 100)
+                x_fake = G(z).detach()
+                D_train(x_real, x_fake , G, D, D_optimizer, Earth_Mover_Loss)
+            G_train(x_real, x_fake, G, D, G_optimizer, Earth_Mover_Loss)
 
-        if epoch % 10 == 0:
+        if epoch % 1 == 0:
             save_models(G, D, 'checkpoints')
                 
     print('Training done')
