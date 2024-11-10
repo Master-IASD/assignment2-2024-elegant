@@ -41,6 +41,7 @@ def G_train(x, G, D, G_optimizer, criterion):
                  
     G_output = G(z)
     D_output = D(G_output)
+    print(D_output)
     G_loss = criterion(D_output, y)
 
     # gradient backprop & optimize ONLY G's parameters
@@ -51,9 +52,9 @@ def G_train(x, G, D, G_optimizer, criterion):
 
 
 
-def save_models(G, D, folder):
-    torch.save(G.state_dict(), os.path.join(folder,'G.pth'))
-    torch.save(D.state_dict(), os.path.join(folder,'D.pth'))
+def save_models(G, D, folder, epoch):
+    torch.save(G.state_dict(), os.path.join(folder,f'G{epoch}.pth'))
+    torch.save(D.state_dict(), os.path.join(folder,f'D{epoch}.pth'))
 
 
 def load_model(G, folder):

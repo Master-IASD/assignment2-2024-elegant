@@ -19,12 +19,12 @@ class Generator(nn.Module):
         return torch.tanh(self.fc4(x))
 
 class Discriminator(nn.Module):
-    def __init__(self, d_input_dim):
+    def __init__(self, d_input_dim, output_dim=1):
         super(Discriminator, self).__init__()
         self.fc1 = nn.Linear(d_input_dim, 1024)
         self.fc2 = nn.Linear(self.fc1.out_features, self.fc1.out_features//2)
         self.fc3 = nn.Linear(self.fc2.out_features, self.fc2.out_features//2)
-        self.fc4 = nn.Linear(self.fc3.out_features, 1)
+        self.fc4 = nn.Linear(self.fc3.out_features, output_dim)
 
     # forward method
     def forward(self, x):
