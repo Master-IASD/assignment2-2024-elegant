@@ -77,7 +77,7 @@ if __name__ == '__main__':
     print('Models loaded.')
 
     # Optimizers
-    G_optimizer = optim.Adam(G.parameters(), lr=1e-3/2, betas=(0.5, 0.999)) # 1e-3 for the first 150 epochs, then /2 for the last 30 epochs (we choose thes)
+    G_optimizer = optim.Adam(G.parameters(), lr=1e-3/2, betas=(0.5, 0.999)) # 1e-3 for the first 150 epochs, then /2 for the last 30 epochs (empirical results)
     D_optimizer = optim.Adam(D.parameters(), lr=3e-4/2, betas=(0.5, 0.999)) # 3e-4 for the first 150 epochs, then /2 for the last 30 epochs
 
     # Training parameters
