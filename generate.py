@@ -10,7 +10,7 @@ from utils import load_model, load_discriminator
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate Normalizing Flow.')
     parser.add_argument("--batch_size", type=int, default=2048,
-                      help="The batch size to use for training.")
+                      help="The batch size to use for generation.")
     args = parser.parse_args()
 
 
@@ -47,6 +47,6 @@ if __name__ == '__main__':
                 total_attempts += 1
                 acceptance_probability = discriminator_scores[k].item()
                 if n_samples < 10000 and torch.rand(1).item() < acceptance_probability:
-                    torchvision.utils.save_image(x[k:k + 1], os.path.join('samples', f'{n_samples}.png'))
+                    torchvision.utils.save_image(x[k:k + 1], os.path.join('samples', f'{n_samples}.jpg'))
                     n_samples += 1
     print(f"Generated {n_samples} samples after {total_attempts} attempts with rejection sampling.")
