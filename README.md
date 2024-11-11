@@ -15,3 +15,7 @@ When your code will be test, we will execute:
 ## Checkpoints
 Push the minimal amount of models in the folder *checkpoints*.
 
+## Remark 
+
+Use the file generate_WGAN.py if you wanna generate samples using WGAN-GP with rejection sampling. (And the file evaluate_WGAN.sh if you wanna try it)
+Here the file generate.py generate samples using Vanilla with rejection sampling.
