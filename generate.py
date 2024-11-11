@@ -14,20 +14,18 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-
-
     print('Model Loading...')
     # Model Pipeline
     mnist_dim = 784
 
     model = Generator(g_output_dim = mnist_dim)
     model = load_model(model, 'checkpoints')
-    model = torch.nn.DataParallel(model)
+    model = torch.nn.DataParallel(model).cuda()
     model.eval()
 
     discriminator = Discriminator(mnist_dim)
     discriminator = load_discriminator(discriminator, 'checkpoints')
-    discriminator = torch.nn.DataParallel(discriminator)
+    discriminator = torch.nn.DataParallel(discriminator).cuda()
     discriminator.eval()
 
     print('Model loaded.')
@@ -41,7 +39,7 @@ if __name__ == '__main__':
     total_attempts = 0
     with torch.no_grad():
         while n_samples<10000:
-            z = torch.randn(args.batch_size, 100)
+            z = torch.randn(args.batch_size, 100).cuda()
             x = model(z)
             x = x.reshape(args.batch_size, 28, 28)
             discriminator_scores = discriminator(x.view(x.size(0), -1))
