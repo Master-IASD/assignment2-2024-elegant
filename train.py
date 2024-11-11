@@ -5,17 +5,16 @@ import argparse
 from torchvision import datasets, transforms
 import torch.nn as nn
 import torch.optim as optim
-
+from scipy.stats import wasserstein_distance
+import numpy as np
 
 from model import Generator, Discriminator
-from utils import D_train, G_train, save_models
-
-
+from utils import D_train, G_train, save_models, load_model
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train Normalizing Flow.')
-    parser.add_argument("--epochs", type=int, default=100,
+    parser.add_argument("--epochs", type=int, default=200,
                         help="Number of epochs for training.")
     parser.add_argument("--lr", type=float, default=0.0002,
                       help="The learning rate to use for training.")
@@ -25,7 +24,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    os.makedirs('chekpoints', exist_ok=True)
+    os.makedirs('checkpoints', exist_ok=True)
     os.makedirs('data', exist_ok=True)
 
     # Data Pipeline
@@ -48,8 +47,8 @@ if __name__ == '__main__':
 
     print('Model Loading...')
     mnist_dim = 784
-    G = torch.nn.DataParallel(Generator(g_output_dim = mnist_dim)).cuda()
-    D = torch.nn.DataParallel(Discriminator(mnist_dim)).cuda()
+    G = torch.nn.DataParallel(Generator(g_output_dim = mnist_dim))
+    D = torch.nn.DataParallel(Discriminator(mnist_dim))
 
 
     # model = DataParallel(model).cuda()
@@ -59,11 +58,12 @@ if __name__ == '__main__':
 
 
     # define loss
+
     criterion = nn.BCELoss() 
 
     # define optimizers
-    G_optimizer = optim.Adam(G.parameters(), lr = args.lr)
-    D_optimizer = optim.Adam(D.parameters(), lr = args.lr)
+    G_optimizer = optim.Adam(G.parameters(), lr = 1e-3, betas=(0.5, 0.9))
+    D_optimizer = optim.Adam(D.parameters(), lr = 3e-4, betas=(0.5, 0.9))
 
     print('Start Training :')
     
@@ -71,10 +71,12 @@ if __name__ == '__main__':
     for epoch in trange(1, n_epoch+1, leave=True):           
         for batch_idx, (x, _) in enumerate(train_loader):
             x = x.view(-1, mnist_dim)
-            D_train(x, G, D, D_optimizer, criterion)
-            G_train(x, G, D, G_optimizer, criterion)
+            #D_train(x, G, D, D_optimizer, criterion)
+            #G_train(x, G, D, G_optimizer, criterion)
+            D_train(x , G, D, D_optimizer)
+            G_train(x, G, D, G_optimizer)
 
-        if epoch % 10 == 0:
+        if epoch % 5 == 0:
             save_models(G, D, 'checkpoints')
                 
     print('Training done')
