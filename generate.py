@@ -20,12 +20,12 @@ if __name__ == '__main__':
 
     model = Generator(g_output_dim = mnist_dim)
     model = load_model(model, 'checkpoints')
-    model = torch.nn.DataParallel(model).cuda()
+    model = torch.nn.DataParallel(model)
     model.eval()
 
     discriminator = Discriminator(mnist_dim)
     discriminator = load_discriminator(discriminator, 'checkpoints')
-    discriminator = torch.nn.DataParallel(discriminator).cuda()
+    discriminator = torch.nn.DataParallel(discriminator)
     discriminator.eval()
 
     print('Model loaded.')
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     total_attempts = 0
     with torch.no_grad():
         while n_samples<10000:
-            z = torch.randn(args.batch_size, 100).cuda()
+            z = torch.randn(args.batch_size, 100)
             x = model(z)
             x = x.reshape(args.batch_size, 28, 28)
             discriminator_scores = discriminator(x.view(x.size(0), -1))
@@ -47,6 +47,6 @@ if __name__ == '__main__':
                 total_attempts += 1
                 acceptance_probability = discriminator_scores[k].item()
                 if n_samples < 10000 and torch.rand(1).item() < acceptance_probability:
-                    torchvision.utils.save_image(x[k:k + 1], os.path.join('samples', f'{n_samples}.jpg'))
+                    torchvision.utils.save_image(x[k:k + 1], os.path.join('samples', f'{n_samples}.png'))
                     n_samples += 1
     print(f"Generated {n_samples} samples after {total_attempts} attempts with rejection sampling.")
