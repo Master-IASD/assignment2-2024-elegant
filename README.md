@@ -19,3 +19,4 @@ Push the minimal amount of models in the folder *checkpoints*.
 
 Use the file generate_WGAN.py if you wanna generate samples using WGAN-GP with rejection sampling. (And the file evaluate_WGAN.sh if you wanna try it)
 Here the file generate.py generate samples using Vanilla with rejection sampling.
+PLEASE NOTE THAT with the file generate_WGAN.py you'll generate JPG images (and not PNG). Because we found that using jpg files instead of png files gave results closer to the platform (which is a bit weird).
