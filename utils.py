@@ -31,8 +31,8 @@ def plot_samples(samples, log_interval, unrolled_steps, path):
             ax = plt.subplot(1, cols, 1)
         else:
             plt.subplot(1, cols, i + 1, sharex=ax, sharey=ax)
-        ax2 = seaborn.kdeplot(samps[:, 0], samps[:, 1], shaded=True, cmap='Greens', n_levels=20,
-                              clip=[[-xmax, xmax]] * 2)
+        ax2 = seaborn.kdeplot(x=samps[:, 0], y=samps[:, 1], fill=True, cmap='Greens', levels=20,
+                              clip=[[-xmax, xmax]] * 2, warn_singular=False)
         plt.xticks([])
         plt.yticks([])
         plt.title('step %d' % (i * log_interval))

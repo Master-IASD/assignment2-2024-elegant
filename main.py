@@ -7,9 +7,9 @@ import torch.optim as optim
 from tqdm import tqdm
 from data import gaussian_data_generator, noise_sampler
 import utils
-from model import Generator, Discriminator
+from model2 import Generator, Discriminator
 from time import gmtime, strftime
-import higher
+# import higher
 import argparse
 
 def d_loop(G, D, d_optimizer, criterion):
@@ -28,6 +28,7 @@ def d_loop(G, D, d_optimizer, criterion):
     with torch.no_grad():
         d_fake_data = G(d_gen_input)
     d_fake_decision = D(d_fake_data)
+    # print(d_fake_decision)
     target = torch.zeros_like(d_fake_decision).cuda()
     d_fake_error = criterion(d_fake_decision, target)  # zeros = fake
 
@@ -187,6 +188,12 @@ if __name__ == '__main__':
 
     samples = []
     for it in tqdm(range(config.num_iterations)):
+        g_fake_data = g_sample()
+        # print(g_fake_data)
+        # import time
+        # time.sleep(1.5)
+
+        
         d_infos = []
         for d_index in range(config.d_steps):
             d_info = d_loop(G, D, d_optimizer, criterion)
@@ -200,6 +207,11 @@ if __name__ == '__main__':
             g_infos.append(g_info)
         g_infos = np.mean(g_infos)
         g_loss = g_infos
+        g_fake_data = g_sample()
+        # print(g_fake_data)
+        # time.sleep(1.5)
+
+
 
         if it % config.log_interval == 0:
             g_fake_data = g_sample()
