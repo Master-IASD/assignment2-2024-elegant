@@ -9,7 +9,7 @@ from tqdm import trange, tqdm
 from model import Generator, Discriminator_WGAN_GP
 from utils import save_models
 from utils_WGP import G_train_WGAN_GP, D_train_WGAN_GP, weights_init, load_model2
-from evaluate import compute_fid
+# from evaluate import compute_fid
 
 
 if __name__ == '__main__':

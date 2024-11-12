@@ -62,18 +62,18 @@ if __name__ == '__main__':
     criterion = nn.BCELoss() 
 
     # define optimizers
-    G_optimizer = optim.Adam(G.parameters(), lr = 1e-3, betas=(0.5, 0.9))
-    D_optimizer = optim.Adam(D.parameters(), lr = 3e-4, betas=(0.5, 0.9))
+    G_optimizer = optim.Adam(G.parameters(), lr = 1e-3, betas=(0.5, 0.999))
+    D_optimizer = optim.Adam(D.parameters(), lr = 3e-4, betas=(0.5, 0.999))
 
     print('Start Training :')
     
     n_epoch = args.epochs
     for epoch in trange(1, n_epoch+1, leave=True):           
         for batch_idx, (x, _) in enumerate(train_loader):
-            x = x.view(-1, mnist_dim)
+            x = x.view(-1, mnist_dim).cuda()
             #D_train(x, G, D, D_optimizer, criterion)
             #G_train(x, G, D, G_optimizer, criterion)
-            D_train(x , G, D, D_optimizer)
+            D_train(x, G, D, D_optimizer)
             G_train(x, G, D, G_optimizer)
 
         if epoch % 5 == 0:

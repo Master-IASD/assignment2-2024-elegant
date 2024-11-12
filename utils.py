@@ -2,9 +2,9 @@ import torch
 import os
 import torch.autograd as autograd
 
-def gradient_penalty(critic, real_data, fake_data, device='cpu'):
+def gradient_penalty(critic, real_data, fake_data):
     # Random weight term for interpolation
-    alpha = torch.rand(real_data.size(0), 1).to(device)
+    alpha = torch.rand(real_data.size(0), 1).cuda()
     alpha = alpha.expand_as(real_data)
     interpolated = alpha * real_data + (1 - alpha) * fake_data
     interpolated.requires_grad_(True)
@@ -16,7 +16,7 @@ def gradient_penalty(critic, real_data, fake_data, device='cpu'):
     # Compute gradients
     gradients = torch.autograd.grad(
         outputs=crit_interpolated, inputs=interpolated,
-        grad_outputs=torch.ones(real_data.size(0), 1),
+        grad_outputs=torch.ones(real_data.size(0), 1).cuda(),
         create_graph=True, retain_graph=True, only_inputs=True
     )[0]
 
@@ -47,7 +47,7 @@ def D_train(x, G, D, D_optimizer):
     x_fake = G(z).detach()
     D_fake_output = D(x_fake)
     #D_fake_real_loss = criterion(D_real_output, D_fake_output)
-    gp_loss = gradient_penalty(D, x, x_fake)
+    gp_loss = gradient_penalty(D, x, x_fake.cuda())
 
     # gradient backprop & optimize ONLY D's parameters
     D_loss = -torch.mean(D_real_output) + torch.mean(D_fake_output) + 10*gp_loss
@@ -64,7 +64,7 @@ def G_train(x, G, D, G_optimizer):
     #=======================Train the generator=======================#
     G.zero_grad()
 
-    z = torch.randn(x.size(0), 100)
+    z = torch.randn(x.size(0), 100).cuda()
     x_fake = G(z)
     D_output = D(x_fake)
     G_loss = -torch.mean(D_output)
