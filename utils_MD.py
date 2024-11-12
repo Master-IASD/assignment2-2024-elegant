@@ -79,8 +79,13 @@ def load_model(G, folder):
     G.load_state_dict({k.replace('module.', ''): v for k, v in ckpt.items()})
     return G
 
+def weights_init(m):
+    if isinstance(m, nn.Linear):
+        nn.init.kaiming_normal_(m.weight, a=0.2)  
+        if m.bias is not None:
+            nn.init.constant_(m.bias, 0)
 
-# Copy-pasted from the https://github.com/haihabi/MD-GAN
+# (Almost) Copy-pasted from the github repo https://github.com/haihabi/MD-GAN
 
 class ScaledSigmoid(nn.Module):
     def __init__(self, scale: float = 5.0, shift: float = 2.5):

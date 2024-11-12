@@ -9,7 +9,7 @@ import torchvision
 
 from model import Generator, Discriminator
 from utils import save_models, G_train
-from utils_MD import D_train_MD, G_train_MD, compute_Lambda, LambdaNetwork
+from utils_MD import D_train_MD, G_train_MD, compute_Lambda, LambdaNetwork, weights_init
 from simplex_generator import simplex_params
 
 
@@ -34,8 +34,8 @@ if __name__ == '__main__':
           'lambda_training_iterations':4000,
           'epochs': args.epochs,
           'eta_lambda': 0.01,
-          'lr_d': 1e-6,
-          'lr_g': 1e-6,
+          'lr_d': 3e-5,
+          'lr_g': 2e-4,
           'epsilon': 1e-8,  # for avoiding numerical instabilities
           'samp_num_gen': 2500,
           'simplex_dim' : 9}
@@ -68,6 +68,8 @@ if __name__ == '__main__':
     mnist_dim = 784
     G = torch.nn.DataParallel(Generator(g_output_dim = mnist_dim)).cuda()
     D = torch.nn.DataParallel(Discriminator(mnist_dim, PARAMS['simplex_dim'])).cuda()
+
+    G.apply(weights_init)
     G_criterion = nn.BCELoss()
 
 
